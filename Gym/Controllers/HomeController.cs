@@ -1,6 +1,7 @@
 using Gym.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Gym.Controllers
 {
@@ -14,6 +15,11 @@ namespace Gym.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Days()
         {
             return View();
         }
