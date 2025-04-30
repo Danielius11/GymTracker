@@ -24,6 +24,11 @@ namespace Gym.Controllers
             return View();
         }
 
+        public IActionResult CreateWorkouts()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
