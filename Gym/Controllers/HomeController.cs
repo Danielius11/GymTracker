@@ -29,6 +29,11 @@ namespace Gym.Controllers
             return View();
         }
 
+        public IActionResult CreateWorkoutsForm(Day model)
+        {
+            return RedirectToAction("Index");
+        }
+
         public IActionResult Privacy()
         {
             return View();
