@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace Gym.Models
+namespace Gym.Models.Entities
 {
     public class Day
     {
+        public Guid Id { get; set; }
         public int Nr { get; set; }
         public string Type { get; set; }
         public string Exercise { get; set; }

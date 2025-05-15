@@ -1,4 +1,5 @@
 using Gym.Models;
+using Gym.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
