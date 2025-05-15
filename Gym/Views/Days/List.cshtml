@@ -25,8 +25,9 @@
                 <td>@day.Type</td>
                 <td>@day.Exercise</td>
                 <td>
-                    <a>Edit</a>
+                    <a class="btn btn-primary" asp-controller="Days" asp-action="Edit" asp-route-id="@day.Id">Edit</a>
                 </td>
+
             </tr>
         }
     </tbody>
