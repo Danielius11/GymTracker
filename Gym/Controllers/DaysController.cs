@@ -2,6 +2,7 @@
 using Gym.Models;
 using Gym.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gym.Controllers
 {
@@ -39,6 +40,14 @@ namespace Gym.Controllers
             dbcontext.SaveChanges();
 
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> List()
+        {
+            var days = await dbcontext.Days.ToListAsync();
+
+            return View(days);
         }
     }
 }

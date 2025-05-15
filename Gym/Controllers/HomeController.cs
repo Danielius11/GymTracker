@@ -25,21 +25,6 @@ namespace Gym.Controllers
             return View();
         }
 
-        public IActionResult CreateWorkouts()
-        {
-            return View();
-        }
-
-        public IActionResult CreateWorkoutsForm(Day model)
-        {
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
