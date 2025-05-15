@@ -1,10 +1,19 @@
-﻿using Gym.Models;
+﻿using Gym.Data;
+using Gym.Models;
+using Gym.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.Controllers
 {
     public class DaysController : Controller
     {
+        private readonly ApplicationDbContext dbcontext;
+
+        public DaysController(ApplicationDbContext dbcontext) 
+        {
+            this.dbcontext = dbcontext;
+        }
+
         [HttpGet]
         public IActionResult Add()
         {
@@ -12,13 +21,22 @@ namespace Gym.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(AddWorkoutsViewModel viewmodel)
+        public async Task<IActionResult> Add(AddWorkoutsViewModel viewmodel)
         {
-            
-            if (viewmodel is null)
+            var day = new Day
+
             {
-                throw new ArgumentNullException(nameof(viewmodel));
-            }
+                Nr = viewmodel.Nr,
+                Type = viewmodel.Type,
+                Exercise = viewmodel.Exercise,
+                Set = viewmodel.Set,
+                Rep = viewmodel.Rep,
+                Kg = viewmodel.Kg,
+                Description = viewmodel.Description
+            };
+
+            await dbcontext.Days.AddAsync(day);
+            dbcontext.SaveChanges();
 
             return View();
         }
