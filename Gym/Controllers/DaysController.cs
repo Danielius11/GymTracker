@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Gym.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Gym.Controllers
 {
@@ -7,6 +8,18 @@ namespace Gym.Controllers
         [HttpGet]
         public IActionResult Add()
         {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Add(AddWorkoutsViewModel viewmodel)
+        {
+            
+            if (viewmodel is null)
+            {
+                throw new ArgumentNullException(nameof(viewmodel));
+            }
+
             return View();
         }
     }
