@@ -3,7 +3,9 @@ using Gym.Models;
 using Gym.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gym.Controllers
 {
@@ -11,42 +13,53 @@ namespace Gym.Controllers
     {
         private readonly ApplicationDbContext dbcontext;
 
-        public DaysController(ApplicationDbContext dbcontext) 
+        public DaysController(ApplicationDbContext context)
         {
-            this.dbcontext = dbcontext;
+            dbcontext = context;
         }
 
         [HttpGet]
         public IActionResult Add()
         {
-            return View();
+            var model = new AddDayWithExercisesViewModel();
+            model.Exercises.Add(new ExerciseInputModel());
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(AddWorkoutsViewModel viewmodel)
+        public async Task<IActionResult> Add(AddDayWithExercisesViewModel model)
         {
-            var day = new Day
+            if (!ModelState.IsValid)
+                return View(model);
 
+            var day = new Day
             {
-                Nr = viewmodel.Nr,
-                Type = viewmodel.Type,
-                Exercise = viewmodel.Exercise,
-                Set = viewmodel.Set,
-                Rep = viewmodel.Rep,
-                Kg = viewmodel.Kg,
-                Description = viewmodel.Description
+                Id = Guid.NewGuid(),
+                Nr = model.Nr,
+                Type = model.Type,
+                Exercises = model.Exercises.Select(e => new Exercise
+                {
+                    Id = Guid.NewGuid(),
+                    Name = e.Name,
+                    Set = e.Set,
+                    Rep = e.Rep,
+                    Kg = e.Kg,
+                    Description = e.Description
+                }).ToList()
             };
 
-            await dbcontext.Days.AddAsync(day);
-            dbcontext.SaveChanges();
+            dbcontext.Days.Add(day);
+            await dbcontext.SaveChangesAsync();
 
-            return View();
+            return RedirectToAction("List");
         }
 
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var days = await dbcontext.Days.ToListAsync();
+            var days = await dbcontext.Days
+                .Include(d => d.Exercises)
+                .ToListAsync();
 
             return View(days);
         }
@@ -54,46 +67,76 @@ namespace Gym.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var day = await dbcontext.Days.FindAsync(id);
-
-            return View(day);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Edit(Day viewmodel)
-        {
-            var day = await dbcontext.Days.FindAsync(viewmodel.Id);
-
-            if (day is not null)
-            {
-                day.Nr = viewmodel.Nr;
-                day.Type = viewmodel.Type;
-                day.Exercise = viewmodel.Exercise;
-                day.Set = viewmodel.Set;
-                day.Rep = viewmodel.Rep;
-                day.Kg = viewmodel.Kg;
-                day.Description = viewmodel.Description;
-
-                await dbcontext.SaveChangesAsync();
-            }
-
-            return RedirectToAction("List", "Days");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete(Day viewmodel)
-        {
             var day = await dbcontext.Days
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == viewmodel.Id);
+                .Include(d => d.Exercises)
+                .FirstOrDefaultAsync(d => d.Id == id);
 
-            if (day is not null)
+            if (day == null)
+                return NotFound();
+
+            var model = new AddDayWithExercisesViewModel
             {
-                dbcontext.Days.Remove(viewmodel);
+                Id = day.Id,
+                Nr = day.Nr,
+                Type = day.Type,
+                Exercises = day.Exercises.Select(e => new ExerciseInputModel
+                {
+                    Name = e.Name,
+                    Set = e.Set,
+                    Rep = e.Rep,
+                    Kg = e.Kg,
+                    Description = e.Description
+                }).ToList()
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Guid id, AddDayWithExercisesViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var day = await dbcontext.Days
+                .Include(d => d.Exercises)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (day == null)
+                return NotFound();
+
+            day.Nr = model.Nr;
+            day.Type = model.Type;
+
+            dbcontext.Exercises.RemoveRange(day.Exercises);
+
+            day.Exercises = model.Exercises.Select(e => new Exercise
+            {
+                Id = Guid.NewGuid(),
+                Name = e.Name,
+                Set = e.Set,
+                Rep = e.Rep,
+                Kg = e.Kg,
+                Description = e.Description
+            }).ToList();
+
+            await dbcontext.SaveChangesAsync();
+
+            return RedirectToAction("List");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var day = await dbcontext.Days.FindAsync(id);
+            if (day != null)
+            {
+                dbcontext.Days.Remove(day);
                 await dbcontext.SaveChangesAsync();
             }
 
-            return RedirectToAction("List", "Days");
+            return RedirectToAction("List");
         }
     }
 }

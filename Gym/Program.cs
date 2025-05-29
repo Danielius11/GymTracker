@@ -1,3 +1,4 @@
+using Gym.Controllers;
 using Gym.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,8 @@ namespace Gym
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<IDaysRepository, DaysRepository>();
 
             builder.Services.AddDbContext<ApplicationDbContext>
                 (options => options.UseSqlServer
