@@ -8,6 +8,8 @@ namespace Gym.Models.Entities
         public int Nr { get; set; }
         public string Type { get; set; }
 
+        public DateTime Date { get; set; }
+
         public List<Exercise> Exercises { get; set; } = new List<Exercise>();
     }
 

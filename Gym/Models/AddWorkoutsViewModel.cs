@@ -1,10 +1,15 @@
-﻿namespace Gym.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Gym.Models
 {
     public class AddDayWithExercisesViewModel
     {
         public Guid Id { get; set; }
         public int Nr { get; set; }
         public string Type { get; set; }
+
+        public DateTime Date { get; set; } = DateTime.Now.Date;
+
         public List<ExerciseInputModel> Exercises { get; set; } = new List<ExerciseInputModel>();
 
     }
